@@ -1,7 +1,7 @@
+import 'dart:js_util';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quiz_app/utilities/quiz_helper.dart';
-
-QuizHelper quizHelper = QuizHelper();
 
 class QuizScreen extends StatefulWidget {
   @override
@@ -9,7 +9,8 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  List<Image> answerIconList = [];
+  List<Widget> answerIconList = [];
+  QuizHelper quizHelper = QuizHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -20,29 +21,32 @@ class _QuizScreenState extends State<QuizScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            const SizedBox(height: 20.0),
             Padding(
-              padding: const EdgeInsets.only(top: 45.0, left: 10.0, right: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
               child: ClipRRect(
                 clipBehavior: Clip.antiAlias,
                 borderRadius: BorderRadius.circular(20),
                 child: LinearProgressIndicator(
                   backgroundColor: Colors.blueGrey,
                   minHeight: 15,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.lightGreen),
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(Colors.lightGreen),
                   value: quizHelper.loadingProcessValue(),
                 ),
               ),
             ),
-            const SizedBox(
-              height: 10.0,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: answerIconList,
-                ),
+            SingleChildScrollView(
+              //TODO? Sağa doğru kaymasını sağlar
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: answerIconList,
               ),
+            ),
+            Wrap(
+              //TODO? Ekranın genilişliği dolduktan sonra alt satıra geçer
+              children: answerIconList,
             ),
             Expanded(
               flex: 4,
@@ -60,43 +64,30 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(12.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.green),
-                  child: const Text(
-                    'True',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20.0,
-                    ),
-                  ),
-                  onPressed: () {
-                    checkAnswer(true);
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(12.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.red),
-                  child: const Text(
-                    'False',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: () {
-                    checkAnswer(false);
-                  },
-                ),
-              ),
-            ),
+            checkAnswerButton(true),
+            checkAnswerButton(false),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget checkAnswerButton(bool answer) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: answer ? Colors.green : Colors.red,
+          ),
+          child: Text(
+            answer ? 'True' : 'False',
+            style: const TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+          onPressed: () => checkAnswer(answer),
         ),
       ),
     );
@@ -104,39 +95,45 @@ class _QuizScreenState extends State<QuizScreen> {
 
   void checkAnswer(bool userPickedAnswer) {
     bool correctAnswer = quizHelper.getCorrectAnswer();
-
     setState(() {
-      if (quizHelper.isFinished() == true) {
-        showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('Finished'),
-            content: const Text('Quiz is over.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'Cancel'),
-                child: const Text('Start Again'),
+      var result = userPickedAnswer == correctAnswer;
+      addIcon(result);
+      quizHelper.isFinished()
+          ? showDialog<String>(
+              barrierDismissible: false,
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('Finished'),
+                content: const Text('Quiz is over.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      quizHelper.reset();
+                      answerIconList.clear();
+                      Navigator.pop(context);
+                      setState(() {});
+                    },
+                    child: const Text('Start Again'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-
-        quizHelper.reset();
-        answerIconList = [];
-      } else {
-        if (userPickedAnswer == correctAnswer) {
-          answerIconList.add(
-            const Image(
-                image: AssetImage("assets/icons/true_icon.png"), height: 70.0),
-          );
-        } else {
-          answerIconList.add(
-            const Image(
-                image: AssetImage("assets/icons/false_icon.png"), height: 70.0),
-          );
-        }
-        quizHelper.nextQuestion();
-      }
+            )
+          : quizHelper.nextQuestion();
     });
+  }
+
+  void addIcon(bool answer) {
+    double phoneWidth = MediaQuery.of(context).size.width;
+    String iconPath =
+        answer ? "assets/icons/true_icon.png" : "assets/icons/false_icon.png";
+    answerIconList.add(
+      Padding(
+        padding: EdgeInsets.all(phoneWidth * 0.01),
+        child: Image(
+          image: AssetImage(iconPath),
+          width: phoneWidth * 0.13,
+        ),
+      ),
+    );
   }
 }
