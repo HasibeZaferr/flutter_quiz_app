@@ -13,89 +13,91 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 45.0, left: 10.0, right: 10.0),
-            child: ClipRRect(
-              clipBehavior: Clip.antiAlias,
-              borderRadius: BorderRadius.circular(20),
-              child: LinearProgressIndicator(
-                backgroundColor: Colors.blueGrey,
-                minHeight: 15,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.lightGreen),
-                value: quizHelper.loadingProcessValue(),
+    return SafeArea(
+      child: Material(
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 45.0, left: 10.0, right: 10.0),
+              child: ClipRRect(
+                clipBehavior: Clip.antiAlias,
+                borderRadius: BorderRadius.circular(20),
+                child: LinearProgressIndicator(
+                  backgroundColor: Colors.blueGrey,
+                  minHeight: 15,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.lightGreen),
+                  value: quizHelper.loadingProcessValue(),
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 10.0,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: answerIconList,
+            const SizedBox(
+              height: 10.0,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: answerIconList,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Center(
-                child: Text(
-                  quizHelper.getQuestionText(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 25.0,
-                    color: Colors.black,
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Center(
+                  child: Text(
+                    quizHelper.getQuestionText(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 25.0,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(12.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.green),
-                child: const Text(
-                  'True',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(primary: Colors.green),
+                  child: const Text(
+                    'True',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                    ),
                   ),
+                  onPressed: () {
+                    checkAnswer(true);
+                  },
                 ),
-                onPressed: () {
-                  checkAnswer(true);
-                },
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(12.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.red),
-                child: const Text(
-                  'False',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(12.0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  child: const Text(
+                    'False',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.white,
+                    ),
                   ),
+                  onPressed: () {
+                    checkAnswer(false);
+                  },
                 ),
-                onPressed: () {
-                  checkAnswer(false);
-                },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
